@@ -1,30 +1,13 @@
-import {
-  CSSReset,
-  ChakraProvider,
-  ColorModeProvider,
-  extendTheme,
-} from "@chakra-ui/react";
+import { CSSReset, ChakraProvider, ColorModeProvider } from "@chakra-ui/react";
 
 import type { AppProps } from "next/app";
-
-const theme = extendTheme({
-  styles: {
-    global: {
-      body: {
-        backgroundColor: "#000",
-        color: "#ccc",
-      },
-    },
-  },
-});
+import theme from "./theme";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <ColorModeProvider
-        options={{
-          useSystemColorMode: true,
-        }}
+        options={{ useSystemColorMode: false, initialColorMode: "dark" }}
       >
         <CSSReset />
         <Component {...pageProps} />

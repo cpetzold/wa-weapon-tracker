@@ -10,13 +10,13 @@ if (require("electron-squirrel-startup")) {
 var createWindow = function () {
     var win = new electron_1.BrowserWindow({
         title: "WA Weapon Tracker",
-        height: 450,
+        height: 458,
         width: 199,
         resizable: false,
         roundedCorners: false,
         frame: false,
         // alwaysOnTop: true,
-        backgroundColor: "#000",
+        backgroundColor: "#000000",
         webPreferences: {
             preload: path.join(electron_1.app.getAppPath(), "src/preload.js")
         }

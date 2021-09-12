@@ -8,8 +8,24 @@ import {
   WeaponSettings,
   parseSchemeWeapons,
 } from "../lib/weapons";
-import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
-import { MouseEvent, useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  DarkMode,
+  Flex,
+  Grid,
+  GridItem,
+  IconButton,
+} from "@chakra-ui/react";
+import { CloseIcon, SettingsIcon, SmallCloseIcon } from "@chakra-ui/icons";
+import {
+  MouseEvent,
+  ReactChildren,
+  ReactElement,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { assoc, clamp, isNil, map, not, range } from "ramda";
 
 import Head from "next/head";
@@ -75,7 +91,6 @@ function Weapon({
 interface WeaponPanelProps {
   schemeWeapons: SchemeWeapons;
   size?: number | string;
-  bottomText?: string;
   onClickWeapon?: (weapon: string, e: MouseEvent) => void;
   onMouseOverWeapon?: (weapon: string) => void;
   onMouseOutWeapon?: (weapon: string) => void;
@@ -87,16 +102,13 @@ function WeaponPanel({
   onMouseOverWeapon,
   onMouseOutWeapon,
   size = "32px",
-  bottomText,
 }: WeaponPanelProps) {
   return (
     <Grid
       templateColumns="32px auto"
       backgroundColor="#777"
-      padding="1px"
       gap="1px"
       alignItems="start"
-      userSelect="none"
     >
       <Grid gap="1px">
         {map(
@@ -104,6 +116,7 @@ function WeaponPanel({
             <GridItem
               key={row}
               backgroundColor="#000"
+              color="#ccc"
               fontSize="x-small"
               padding="2px"
               width={size}
@@ -134,25 +147,16 @@ function WeaponPanel({
           </GridItem>
         ))}
       </Grid>
-
-      <GridItem
-        colSpan={2}
-        backgroundColor="#000"
-        fontSize="x-small"
-        padding="2px"
-      >
-        {bottomText}&nbsp;
-      </GridItem>
     </Grid>
   );
 }
 
 const Home: NextPage = () => {
-  // @ts-ignore
-  const inApp = global?.window?.api;
   const [showMenu, setShowMenu] = useState(false);
   const [schemeWeapons, setSchemeWeapons] = useState(DEFAULT_SCHEME_WEAPONS);
-  const [hoveredWeapon, setHoveredWeapon] = useState<string>();
+  const [bottomTooltip, setBottomTooltip] = useState<string>();
+
+  const schemeUploadInputRef = useRef<HTMLInputElement>(null);
 
   const updateWeapon = (
     weaponName: string,
@@ -164,7 +168,8 @@ const Home: NextPage = () => {
   };
 
   useEffect(() => {
-    if (inApp) {
+    // @ts-ignore
+    if (global?.window?.api) {
       // @ts-ignore
       window.api.on("toggleMenu", () => setShowMenu(not));
     }
@@ -175,52 +180,98 @@ const Home: NextPage = () => {
     <Flex
       direction="column"
       alignItems="start"
-      sx={{ "-webkit-app-region": "drag" }}
+      userSelect="none"
+      sx={{ WebkitAppRegion: "drag" }}
     >
       <Head>
         <title>W:A Weapon Tracker</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {(!inApp || showMenu) && (
-        <Flex>
-          <input
-            type="file"
-            onChange={async (e) => {
-              const schemeFile = e.target.files?.[0];
-              if (!schemeFile) {
+      <Flex
+        direction="column"
+        width="199px"
+        height="458px"
+        border="1px solid #999"
+        gap="1px"
+      >
+        {showMenu ? (
+          <Flex flex={1} padding="2">
+            <Button
+              size="sm"
+              onClick={() => schemeUploadInputRef.current?.click()}
+            >
+              Scheme
+            </Button>
+            <input
+              ref={schemeUploadInputRef}
+              type="file"
+              hidden
+              onChange={async (e) => {
+                const schemeFile = e.target.files?.[0];
+                if (!schemeFile) {
+                  return;
+                }
+
+                const schemeWeapons = await parseSchemeWeapons(schemeFile);
+                setSchemeWeapons(schemeWeapons);
+                setShowMenu(false);
+              }}
+            />
+          </Flex>
+        ) : (
+          <WeaponPanel
+            schemeWeapons={schemeWeapons}
+            onClickWeapon={(weaponName, e) => {
+              if (ALWAYS_PRESENT_WEAPONS.includes(weaponName)) {
                 return;
               }
 
-              const schemeWeapons = await parseSchemeWeapons(schemeFile);
-              setSchemeWeapons(schemeWeapons);
-              setShowMenu(false);
+              updateWeapon(weaponName, (settings) => ({
+                ...settings,
+                ammunition: clamp(
+                  MIN_AMMUNITION,
+                  MAX_AMMUNITION,
+                  settings.ammunition + (e.shiftKey ? 1 : -1)
+                ),
+              }));
             }}
+            onMouseOverWeapon={setBottomTooltip}
+            onMouseOutWeapon={(_weaponName) => setBottomTooltip(undefined)}
           />
+        )}
+        <Flex
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          backgroundColor="#000"
+          fontSize="small"
+          padding="1"
+          height="28px"
+          borderTop="1px solid #999"
+        >
+          <Box>{bottomTooltip}</Box>
+          {showMenu ? (
+            <SmallCloseIcon
+              cursor="pointer"
+              color="#ccc"
+              sx={{ _hover: { color: "white" } }}
+              onMouseOver={() => setBottomTooltip("Close settings")}
+              onMouseOut={() => setBottomTooltip(undefined)}
+              onClick={() => setShowMenu(false)}
+            />
+          ) : (
+            <SettingsIcon
+              cursor="pointer"
+              color="#ccc"
+              sx={{ _hover: { color: "white" } }}
+              onMouseOver={() => setBottomTooltip("Settings")}
+              onMouseOut={() => setBottomTooltip(undefined)}
+              onClick={() => setShowMenu(true)}
+            />
+          )}
         </Flex>
-      )}
-      {(!inApp || !showMenu) && (
-        <WeaponPanel
-          schemeWeapons={schemeWeapons}
-          bottomText={hoveredWeapon}
-          onClickWeapon={(weaponName, e) => {
-            if (ALWAYS_PRESENT_WEAPONS.includes(weaponName)) {
-              return;
-            }
-
-            updateWeapon(weaponName, (settings) => ({
-              ...settings,
-              ammunition: clamp(
-                MIN_AMMUNITION,
-                MAX_AMMUNITION,
-                settings.ammunition + (e.shiftKey ? 1 : -1)
-              ),
-            }));
-          }}
-          onMouseOverWeapon={setHoveredWeapon}
-          onMouseOutWeapon={(_weaponName) => setHoveredWeapon(undefined)}
-        />
-      )}
+      </Flex>
     </Flex>
   );
 };

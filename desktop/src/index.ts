@@ -11,20 +11,20 @@ if (require("electron-squirrel-startup")) {
 const createWindow = (): void => {
   const win = new BrowserWindow({
     title: "WA Weapon Tracker",
-    height: 450,
+    height: 458,
     width: 199,
     resizable: false,
     roundedCorners: false,
     frame: false,
     // alwaysOnTop: true,
-    backgroundColor: "#000",
+    backgroundColor: "#000000",
     webPreferences: {
       preload: path.join(app.getAppPath(), "src/preload.js"),
     },
   });
 
   win.loadURL("http://localhost:3000");
-  // win.webContents.openDevTools({ mode: "detach" });
+  win.webContents.openDevTools({ mode: "detach" });
 
   globalShortcut.register("Alt+CommandOrControl+M", () => {
     win.webContents.send("toggleMenu");
