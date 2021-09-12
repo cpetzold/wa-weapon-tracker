@@ -129,12 +129,12 @@ function WeaponPanel({}) {
       </Grid>
       <Grid templateColumns="repeat(5, auto)" gap="1px">
         {WEAPONS.map((weapon) => (
-          <GridItem key={weapon} height={size}>
+          <GridItem key={weapon} width={size} height={size}>
             <Image
               alt={weapon}
               src={`/weapons/${weapon}.png`}
-              width={size}
-              height={size}
+              width={500}
+              height={500}
             />
           </GridItem>
         ))}
