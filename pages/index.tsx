@@ -190,7 +190,6 @@ const Home: NextPage = () => {
           schemeWeapons={schemeWeapons}
           bottomText={hoveredWeapon}
           onClickWeapon={(weaponName, e) => {
-            console.log(weaponName, e);
             updateWeapon(weaponName, (settings) => ({
               ...settings,
               ammunition: clamp(
