@@ -1,6 +1,7 @@
 {
   "name": "wa-weapon-tracker",
   "productName": "wa-weapon-tracker",
+  "description": "wa-weapon-tracker",
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
