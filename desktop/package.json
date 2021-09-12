@@ -2,10 +2,11 @@
   "name": "wa-weapon-tracker",
   "productName": "wa-weapon-tracker",
   "description": "wa-weapon-tracker",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && electron-forge start",
+    "build": "tsc",
+    "start": "npm run build && electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
