@@ -110,7 +110,7 @@ function WeaponPanel({
       gap="1px"
       alignItems="start"
     >
-      <Grid gap="1px">
+      <Grid gap="1px" sx={{ WebkitAppRegion: "drag" }}>
         {map(
           (row) => (
             <GridItem
@@ -181,7 +181,6 @@ const Home: NextPage = () => {
       direction="column"
       alignItems="start"
       userSelect="none"
-      sx={{ WebkitAppRegion: "drag" }}
     >
       <Head>
         <title>W:A Weapon Tracker</title>

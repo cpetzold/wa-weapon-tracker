@@ -16,19 +16,22 @@ const createWindow = (): void => {
     resizable: false,
     roundedCorners: false,
     frame: false,
-    // alwaysOnTop: true,
     backgroundColor: "#000000",
     webPreferences: {
       preload: path.join(app.getAppPath(), "src/preload.js"),
     },
   });
 
-  win.loadURL("https://weapons.wormsleague.com");
-  win.webContents.openDevTools({ mode: "detach" });
+  win.setAlwaysOnTop(true, "screen-saver");
+  win.setVisibleOnAllWorkspaces(true);
 
-  globalShortcut.register("Alt+CommandOrControl+M", () => {
-    win.webContents.send("toggleMenu");
-  });
+  // win.loadURL("http://localhost:3000");
+  win.loadURL("https://weapons.wormsleague.com");
+  // win.webContents.openDevTools({ mode: "detach" });
+
+  // globalShortcut.register("Alt+CommandOrControl+M", () => {
+  //   win.webContents.send("toggleMenu");
+  // });
 };
 
 app.on("ready", createWindow);
