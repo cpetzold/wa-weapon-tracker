@@ -4,6 +4,7 @@ import { map, range } from "ramda";
 import Head from "next/head";
 import Image from "next/image";
 import type { NextPage } from "next";
+import { useState } from "react";
 
 const WEAPONS = [
   // Util
@@ -98,13 +99,23 @@ const WEAPONS = [
   "Patsy's Magic Bullet",
 ];
 
-function WeaponPanel({}) {
-  const size = "32px";
+interface WeaponPanelProps {
+  size?: number | string;
+  bottomText?: string;
+  onMouseOverWeapon?: (weapon: string) => void;
+  onMouseOutWeapon?: (weapon: string) => void;
+}
 
+function WeaponPanel({
+  onMouseOverWeapon,
+  onMouseOutWeapon,
+  size = "32px",
+  bottomText,
+}: WeaponPanelProps) {
   return (
     <Grid
       templateColumns="32px auto"
-      backgroundColor="#ccc"
+      backgroundColor="#777"
       padding="1px"
       gap="1px"
       alignItems="start"
@@ -115,7 +126,6 @@ function WeaponPanel({}) {
             <GridItem
               key={row}
               backgroundColor="#000"
-              color="#ccc"
               fontSize="x-small"
               padding="2px"
               width={size}
@@ -129,21 +139,42 @@ function WeaponPanel({}) {
       </Grid>
       <Grid templateColumns="repeat(5, auto)" gap="1px">
         {WEAPONS.map((weapon) => (
-          <GridItem key={weapon} width={size} height={size}>
+          <GridItem
+            key={weapon}
+            width={size}
+            height={size}
+            cursor="pointer"
+            onMouseOver={(e) => onMouseOverWeapon?.(weapon)}
+            onMouseOut={(e) => onMouseOutWeapon?.(weapon)}
+            _hover={{
+              boxShadow: "0 0 0 1px #fff",
+            }}
+          >
             <Image
               alt={weapon}
               src={`/weapons/${weapon}.png`}
-              width={500}
-              height={500}
+              width={size}
+              height={size}
             />
           </GridItem>
         ))}
       </Grid>
+
+      <GridItem
+        colSpan={2}
+        backgroundColor="#000"
+        fontSize="x-small"
+        padding="2px"
+      >
+        {bottomText}&nbsp;
+      </GridItem>
     </Grid>
   );
 }
 
 const Home: NextPage = () => {
+  const [hoveredWeapon, setHoveredWeapon] = useState<string>();
+
   return (
     <div>
       <Head>
@@ -158,7 +189,11 @@ const Home: NextPage = () => {
         alignItems="center"
         justifyContent="center"
       >
-        <WeaponPanel />
+        <WeaponPanel
+          bottomText={hoveredWeapon}
+          onMouseOverWeapon={setHoveredWeapon}
+          onMouseOutWeapon={(weapon) => setHoveredWeapon(undefined)}
+        />
       </Flex>
     </div>
   );
