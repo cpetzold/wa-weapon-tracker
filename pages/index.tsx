@@ -9,8 +9,8 @@ import {
   parseSchemeWeapons,
 } from "../lib/weapons";
 import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
-import { MouseEvent, SyntheticEvent, useState } from "react";
-import { assoc, clamp, isNil, map, range } from "ramda";
+import { MouseEvent, useEffect, useState } from "react";
+import { assoc, clamp, isNil, map, not, range } from "ramda";
 
 import Head from "next/head";
 import Image from "next/image";
@@ -148,6 +148,9 @@ function WeaponPanel({
 }
 
 const Home: NextPage = () => {
+  // @ts-ignore
+  const inApp = global?.window?.api;
+  const [showMenu, setShowMenu] = useState(false);
   const [schemeWeapons, setSchemeWeapons] = useState(DEFAULT_SCHEME_WEAPONS);
   const [hoveredWeapon, setHoveredWeapon] = useState<string>();
 
@@ -160,32 +163,43 @@ const Home: NextPage = () => {
     );
   };
 
+  useEffect(() => {
+    if (inApp) {
+      // @ts-ignore
+      window.api.on("toggleMenu", () => setShowMenu(not));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <div>
+    <Flex
+      direction="column"
+      alignItems="start"
+      sx={{ "-webkit-app-region": "drag" }}
+    >
       <Head>
         <title>W:A Weapon Tracker</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Flex
-        width="100vw"
-        height="100vh"
-        alignItems="center"
-        justifyContent="center"
-        flexDirection="column"
-      >
-        <input
-          type="file"
-          onChange={async (e) => {
-            const schemeFile = e.target.files?.[0];
-            if (!schemeFile) {
-              return;
-            }
+      {(!inApp || showMenu) && (
+        <Flex>
+          <input
+            type="file"
+            onChange={async (e) => {
+              const schemeFile = e.target.files?.[0];
+              if (!schemeFile) {
+                return;
+              }
 
-            const schemeWeapons = await parseSchemeWeapons(schemeFile);
-            setSchemeWeapons(schemeWeapons);
-          }}
-        />
+              const schemeWeapons = await parseSchemeWeapons(schemeFile);
+              setSchemeWeapons(schemeWeapons);
+              setShowMenu(false);
+            }}
+          />
+        </Flex>
+      )}
+      {(!inApp || !showMenu) && (
         <WeaponPanel
           schemeWeapons={schemeWeapons}
           bottomText={hoveredWeapon}
@@ -206,8 +220,8 @@ const Home: NextPage = () => {
           onMouseOverWeapon={setHoveredWeapon}
           onMouseOutWeapon={(_weaponName) => setHoveredWeapon(undefined)}
         />
-      </Flex>
-    </div>
+      )}
+    </Flex>
   );
 };
 

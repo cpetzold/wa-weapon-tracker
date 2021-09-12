@@ -16,6 +16,7 @@
     "@types/ramda": "^0.27.44",
     "binary-parser": "^1.9.2",
     "chakra": "0.0.3",
+    "electron": "^14.0.0",
     "framer-motion": "^4.1.17",
     "next": "11.1.2",
     "ramda": "^0.27.1",

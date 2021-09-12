@@ -100,7 +100,7 @@ const SCHEME_WEAPONS = [
   "Mike's Carpet Bomb",
   "Patsy's Magic Bullet",
   "Indian Nuclear Test",
-  "Select Worm",
+  "Worm Select",
   "Salvation Army",
   "Mole Squadron",
   "MB Bomb",
@@ -116,7 +116,7 @@ export const DEFAULT_SCHEME_WEAPONS: SchemeWeapons = zipObj(
   repeat({ ammunition: MAX_AMMUNITION }, SCHEME_WEAPONS.length)
 );
 
-export const ALWAYS_PRESENT_WEAPONS = ["Skip Go", "Surrender", "Worm Select"];
+export const ALWAYS_PRESENT_WEAPONS = ["Skip Go", "Surrender"];
 
 export const PANEL_WEAPONS = [
   // Util
