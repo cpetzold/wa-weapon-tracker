@@ -23,7 +23,7 @@ const createWindow = (): void => {
     },
   });
 
-  win.loadURL("http://localhost:3000");
+  win.loadURL("https://weapons.wormsleague.com");
   win.webContents.openDevTools({ mode: "detach" });
 
   globalShortcut.register("Alt+CommandOrControl+M", () => {

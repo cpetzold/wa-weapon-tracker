@@ -21,7 +21,7 @@ var createWindow = function () {
             preload: path.join(electron_1.app.getAppPath(), "src/preload.js")
         }
     });
-    win.loadURL("http://localhost:3000");
+    win.loadURL("https://weapons.wormsleague.com");
     win.webContents.openDevTools({ mode: "detach" });
     electron_1.globalShortcut.register("Alt+CommandOrControl+M", function () {
         win.webContents.send("toggleMenu");
