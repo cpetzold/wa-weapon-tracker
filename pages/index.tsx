@@ -1,9 +1,11 @@
-import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
 import {
+  ALWAYS_PRESENT_WEAPONS,
+  DEFAULT_SCHEME_WEAPONS,
   PANEL_WEAPONS,
   SchemeWeapons,
   parseSchemeWeapons,
 } from "../lib/weapons";
+import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
 import { isNil, map, range } from "ramda";
 
 import Head from "next/head";
@@ -14,7 +16,7 @@ import { useState } from "react";
 interface WeaponProps {
   name: string;
   size: number | string;
-  ammunition?: number;
+  ammunition: number;
   onMouseOver?: (weapon: string) => void;
   onMouseOut?: (weapon: string) => void;
 }
@@ -26,9 +28,7 @@ function Weapon({
   onMouseOver,
   onMouseOut,
 }: WeaponProps) {
-  const show = isNil(ammunition) || ammunition > 0;
-
-  if (!show) {
+  if (!ALWAYS_PRESENT_WEAPONS.includes(name) && !ammunition) {
     return null;
   }
 
@@ -54,7 +54,7 @@ function Weapon({
 }
 
 interface WeaponPanelProps {
-  schemeWeapons?: SchemeWeapons;
+  schemeWeapons: SchemeWeapons;
   size?: number | string;
   bottomText?: string;
   onMouseOverWeapon?: (weapon: string) => void;
@@ -125,7 +125,7 @@ function WeaponPanel({
 }
 
 const Home: NextPage = () => {
-  const [schemeWeapons, setSchemeWeapons] = useState({});
+  const [schemeWeapons, setSchemeWeapons] = useState(DEFAULT_SCHEME_WEAPONS);
   const [hoveredWeapon, setHoveredWeapon] = useState<string>();
 
   return (

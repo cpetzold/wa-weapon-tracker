@@ -1,11 +1,12 @@
+import { repeat, zipObj } from "ramda";
+
 import { Parser } from "binary-parser";
-import { zipObj } from "ramda";
 
 export interface Weapon {
   ammunition: number;
-  power: number;
-  delay: number;
-  probability: number;
+  power?: number;
+  delay?: number;
+  probability?: number;
 }
 
 export type SchemeWeapons = { [weaponName: string]: Weapon };
@@ -54,7 +55,7 @@ const SCHEME_WEAPONS = [
   "Uzi",
   "Minigun",
   "Longbow",
-  "Airstrike",
+  "Air Strike",
   "Napalm Strike",
   "Mine",
   "Fire Punch",
@@ -91,8 +92,8 @@ const SCHEME_WEAPONS = [
   "Mine Strike",
   "Girder Starter Pack",
   "Earthquake",
-  "Scales Of Justice",
-  "Ming Vase",
+  "Scales of Justice",
+  "Priceless Ming Vase",
   "Mike's Carpet Bomb",
   "Patsy's Magic Bullet",
   "Indian Nuclear Test",
@@ -102,10 +103,17 @@ const SCHEME_WEAPONS = [
   "MB Bomb",
   "Concrete Donkey",
   "Suicide Bomber",
-  "Sheep Strike",
+  "French Sheep Strike",
   "Mail Strike",
   "Armageddon",
 ];
+
+export const DEFAULT_SCHEME_WEAPONS: SchemeWeapons = zipObj(
+  SCHEME_WEAPONS,
+  repeat({ ammunition: 10 }, SCHEME_WEAPONS.length)
+);
+
+export const ALWAYS_PRESENT_WEAPONS = ["Skip Go", "Surrender", "Worm Select"];
 
 export const PANEL_WEAPONS = [
   // Util
@@ -124,10 +132,10 @@ export const PANEL_WEAPONS = [
 
   // F2
   "Grenade",
-  "Cluster",
+  "Cluster Bomb",
   "Banana Bomb",
   "Battle Axe",
-  "Earth Quake",
+  "Earthquake",
 
   // F3
   "Shotgun",
@@ -162,7 +170,7 @@ export const PANEL_WEAPONS = [
   "Pneumatic Drill",
   "Girder",
   "Baseball Bat",
-  "Girder Starter-Pack",
+  "Girder Starter Pack",
 
   // F8
   "Ninja Rope",
@@ -172,8 +180,8 @@ export const PANEL_WEAPONS = [
   "Scales of Justice",
 
   // F9
-  "Super Banana",
-  "Holy Hand-Grenade",
+  "Super Banana Bomb",
+  "Holy Hand Grenade",
   "Flame Thrower",
   "Salvation Army",
   "MB Bomb",
