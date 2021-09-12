@@ -1,22 +1,26 @@
 import {
   ALWAYS_PRESENT_WEAPONS,
   DEFAULT_SCHEME_WEAPONS,
+  MAX_AMMUNITION,
+  MIN_AMMUNITION,
   PANEL_WEAPONS,
   SchemeWeapons,
+  WeaponSettings,
   parseSchemeWeapons,
 } from "../lib/weapons";
 import { Box, Flex, Grid, GridItem } from "@chakra-ui/react";
-import { isNil, map, range } from "ramda";
+import { MouseEvent, SyntheticEvent, useState } from "react";
+import { assoc, clamp, isNil, map, range } from "ramda";
 
 import Head from "next/head";
 import Image from "next/image";
 import type { NextPage } from "next";
-import { useState } from "react";
 
 interface WeaponProps {
   name: string;
   size: number | string;
   ammunition: number;
+  onClick?: (weapon: string, e: MouseEvent) => void;
   onMouseOver?: (weapon: string) => void;
   onMouseOut?: (weapon: string) => void;
 }
@@ -25,30 +29,45 @@ function Weapon({
   name,
   size,
   ammunition,
+  onClick,
   onMouseOver,
   onMouseOut,
 }: WeaponProps) {
-  if (!ALWAYS_PRESENT_WEAPONS.includes(name) && !ammunition) {
-    return null;
-  }
-
   return (
     <Box
+      position="relative"
       cursor="pointer"
       width={size}
       height={size}
-      onMouseOver={(e) => onMouseOver?.(name)}
-      onMouseOut={(e) => onMouseOut?.(name)}
       _hover={{
         boxShadow: "0 0 0 1px #fff",
       }}
+      onClick={(e) => onClick?.(name, e)}
+      onMouseOver={(e) => onMouseOver?.(name)}
+      onMouseOut={(e) => onMouseOut?.(name)}
     >
-      <Image
-        alt={name}
-        src={`/weapons/${name}.png`}
-        width={size}
-        height={size}
-      />
+      {(ALWAYS_PRESENT_WEAPONS.includes(name) || ammunition > 0) && (
+        <Image
+          alt={name}
+          src={`/weapons/${name}.png`}
+          width={size}
+          height={size}
+        />
+      )}
+      {!isNil(ammunition) && ammunition < 10 && ammunition > 0 && (
+        <Box
+          position="absolute"
+          bottom={0}
+          right={0}
+          fontSize="x-small"
+          backgroundColor="red.600"
+          color="white"
+          padding="0px 1px 0px 2px"
+          borderTopLeftRadius="3px"
+        >
+          {ammunition}
+        </Box>
+      )}
     </Box>
   );
 }
@@ -57,12 +76,14 @@ interface WeaponPanelProps {
   schemeWeapons: SchemeWeapons;
   size?: number | string;
   bottomText?: string;
+  onClickWeapon?: (weapon: string, e: MouseEvent) => void;
   onMouseOverWeapon?: (weapon: string) => void;
   onMouseOutWeapon?: (weapon: string) => void;
 }
 
 function WeaponPanel({
   schemeWeapons,
+  onClickWeapon,
   onMouseOverWeapon,
   onMouseOutWeapon,
   size = "32px",
@@ -75,6 +96,7 @@ function WeaponPanel({
       padding="1px"
       gap="1px"
       alignItems="start"
+      userSelect="none"
     >
       <Grid gap="1px">
         {map(
@@ -103,6 +125,7 @@ function WeaponPanel({
           >
             <Weapon
               name={weaponName}
+              onClick={onClickWeapon}
               onMouseOver={onMouseOverWeapon}
               onMouseOut={onMouseOutWeapon}
               size={size}
@@ -127,6 +150,15 @@ function WeaponPanel({
 const Home: NextPage = () => {
   const [schemeWeapons, setSchemeWeapons] = useState(DEFAULT_SCHEME_WEAPONS);
   const [hoveredWeapon, setHoveredWeapon] = useState<string>();
+
+  const updateWeapon = (
+    weaponName: string,
+    updater: (weaponSettings: WeaponSettings) => WeaponSettings
+  ) => {
+    setSchemeWeapons((schemeWeapons) =>
+      assoc(weaponName, updater(schemeWeapons[weaponName]), schemeWeapons)
+    );
+  };
 
   return (
     <div>
@@ -157,8 +189,19 @@ const Home: NextPage = () => {
         <WeaponPanel
           schemeWeapons={schemeWeapons}
           bottomText={hoveredWeapon}
+          onClickWeapon={(weaponName, e) => {
+            console.log(weaponName, e);
+            updateWeapon(weaponName, (settings) => ({
+              ...settings,
+              ammunition: clamp(
+                MIN_AMMUNITION,
+                MAX_AMMUNITION,
+                settings.ammunition + (e.shiftKey ? 1 : -1)
+              ),
+            }));
+          }}
           onMouseOverWeapon={setHoveredWeapon}
-          onMouseOutWeapon={(weapon) => setHoveredWeapon(undefined)}
+          onMouseOutWeapon={(_weaponName) => setHoveredWeapon(undefined)}
         />
       </Flex>
     </div>

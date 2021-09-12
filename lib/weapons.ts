@@ -2,14 +2,17 @@ import { repeat, zipObj } from "ramda";
 
 import { Parser } from "binary-parser";
 
-export interface Weapon {
+export const MIN_AMMUNITION = 0;
+export const MAX_AMMUNITION = 10;
+
+export interface WeaponSettings {
   ammunition: number;
   power?: number;
   delay?: number;
   probability?: number;
 }
 
-export type SchemeWeapons = { [weaponName: string]: Weapon };
+export type SchemeWeapons = { [weaponName: string]: WeaponSettings };
 
 const weaponsParser = new Parser()
   .uint8("ammunition")
@@ -21,7 +24,7 @@ const schemeWeaponsParser = new Parser()
   .seek(0x29)
   .array("weapons", { type: weaponsParser, length: 64 });
 
-function readSchemeWeapons(schemeFile: File): Promise<Weapon[]> {
+function readSchemeWeapons(schemeFile: File): Promise<WeaponSettings[]> {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.addEventListener("load", () => {
@@ -110,7 +113,7 @@ const SCHEME_WEAPONS = [
 
 export const DEFAULT_SCHEME_WEAPONS: SchemeWeapons = zipObj(
   SCHEME_WEAPONS,
-  repeat({ ammunition: 10 }, SCHEME_WEAPONS.length)
+  repeat({ ammunition: MAX_AMMUNITION }, SCHEME_WEAPONS.length)
 );
 
 export const ALWAYS_PRESENT_WEAPONS = ["Skip Go", "Surrender", "Worm Select"];
