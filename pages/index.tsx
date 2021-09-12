@@ -190,6 +190,10 @@ const Home: NextPage = () => {
           schemeWeapons={schemeWeapons}
           bottomText={hoveredWeapon}
           onClickWeapon={(weaponName, e) => {
+            if (ALWAYS_PRESENT_WEAPONS.includes(weaponName)) {
+              return;
+            }
+
             updateWeapon(weaponName, (settings) => ({
               ...settings,
               ammunition: clamp(
