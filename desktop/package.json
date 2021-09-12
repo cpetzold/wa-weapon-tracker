@@ -2,7 +2,7 @@
   "name": "wa-weapon-tracker",
   "productName": "wa-weapon-tracker",
   "description": "wa-weapon-tracker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && electron-forge start",
