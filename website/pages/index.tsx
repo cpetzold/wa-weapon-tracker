@@ -62,14 +62,14 @@ function Weapon({
       onMouseOver={(e) => onMouseOver?.(name)}
       onMouseOut={(e) => onMouseOut?.(name)}
     >
-      {(ALWAYS_PRESENT_WEAPONS.includes(name) || ammunition > 0) && (
+      <Box opacity={(ALWAYS_PRESENT_WEAPONS.includes(name) || ammunition > 0) ? 1 : 0.1}>
         <Image
           alt={name}
           src={`/weapons/${name}.png`}
           width={size}
           height={size}
         />
-      )}
+      </Box>
       {!isNil(ammunition) && ammunition < 10 && ammunition > 0 && (
         <Box
           position="absolute"
